@@ -248,19 +248,34 @@ app.innerHTML = `
   </main>
 `;
 
-const form = app.querySelector<HTMLFormElement>("form.palette-form");
-const colorField = app.querySelector<HTMLInputElement>(".color-picker");
-const hexField = app.querySelector<HTMLInputElement>(".hex-input");
-const previewCard = app.querySelector<HTMLDivElement>("[data-role=preview]");
-const previewHex = app.querySelector<HTMLSpanElement>("[data-role=preview-hex]");
-const suggestionsGrid = app.querySelector<HTMLDivElement>(
-  "[data-role=suggestions]"
+const form = requireElement<HTMLFormElement>(
+  app.querySelector("form.palette-form"),
+  "Form element not found"
 );
-const statusText = app.querySelector<HTMLDivElement>("[data-role=status]");
-
-if (!form || !colorField || !hexField || !previewCard || !previewHex || !suggestionsGrid || !statusText) {
-  throw new Error("Failed to initialize application layout");
-}
+const colorField = requireElement<HTMLInputElement>(
+  app.querySelector(".color-picker"),
+  "Color picker not found"
+);
+const hexField = requireElement<HTMLInputElement>(
+  app.querySelector(".hex-input"),
+  "Hex input not found"
+);
+const previewCard = requireElement<HTMLDivElement>(
+  app.querySelector("[data-role=preview]"),
+  "Preview card not found"
+);
+const previewHex = requireElement<HTMLSpanElement>(
+  app.querySelector("[data-role=preview-hex]"),
+  "Preview hex label not found"
+);
+const suggestionsGrid = requireElement<HTMLDivElement>(
+  app.querySelector("[data-role=suggestions]"),
+  "Suggestions container not found"
+);
+const statusText = requireElement<HTMLDivElement>(
+  app.querySelector("[data-role=status]"),
+  "Status container not found"
+);
 
 let isRequestInFlight = false;
 
@@ -379,4 +394,11 @@ function normalizeHexInput(value: string): string {
 
 function isValidHex(value: string): boolean {
   return /^#[0-9A-F]{6}$/i.test(value.trim());
+}
+
+function requireElement<T>(value: T | null, message: string): T {
+  if (!value) {
+    throw new Error(message);
+  }
+  return value;
 }
