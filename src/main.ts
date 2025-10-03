@@ -102,26 +102,47 @@ style.textContent = `
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 
-  .advanced-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 16px;
-    border-radius: 12px;
+  .advanced-picker {
+    display: none;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .advanced-picker__panel {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    padding: 16px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .advanced-picker__panel h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    text-align: center;
+  }
+
+  .advanced-picker__preview {
+    width: 100%;
+    height: 120px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .advanced-picker__hex {
+    margin: 0;
     font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease, box-shadow 0.2s ease;
+    font-size: 1.1rem;
+    text-align: center;
+    color: rgba(17, 24, 39, 0.85);
   }
 
-  .advanced-button:hover {
-    background: rgba(76, 110, 245, 0.12);
-    box-shadow: 0 8px 22px rgba(76, 110, 245, 0.2);
-  }
-
-  .advanced-button:focus {
-    outline: 3px solid rgba(76, 110, 245, 0.25);
+  .advanced-picker__sliders {
+    display: grid;
+    gap: 16px;
   }
 
   .color-picker {
@@ -222,57 +243,6 @@ style.textContent = `
     color: rgba(55, 65, 81, 0.75);
   }
 
-  .color-dialog {
-    position: fixed;
-    inset: 0;
-    background: rgba(17, 24, 39, 0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    z-index: 40;
-  }
-
-  .color-dialog[hidden] {
-    display: none;
-  }
-
-  .color-dialog__panel {
-    width: min(420px, 100%);
-    background: rgba(255, 255, 255, 0.96);
-    border-radius: 20px;
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
-    padding: 24px;
-    display: grid;
-    gap: 20px;
-  }
-
-  .color-dialog__panel h3 {
-    margin: 0;
-    font-size: 1.25rem;
-  }
-
-  .color-dialog__preview {
-    width: 100%;
-    height: 120px;
-    border-radius: 16px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  }
-
-  .color-dialog__hex {
-    margin: 0;
-    font-weight: 600;
-    font-size: 1.1rem;
-    text-align: center;
-    color: rgba(17, 24, 39, 0.85);
-  }
-
-  .color-dialog__sliders {
-    display: grid;
-    gap: 16px;
-  }
-
   .slider-row {
     display: grid;
     gap: 8px;
@@ -299,31 +269,6 @@ style.textContent = `
     width: 100%;
   }
 
-  .color-dialog__actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-
-  .color-dialog__actions button {
-    padding: 10px 16px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-    font-weight: 600;
-  }
-
-  .color-dialog__actions button.primary {
-    background: var(--accent);
-    color: white;
-    border: none;
-  }
-
-  .color-dialog__actions button.primary:hover {
-    box-shadow: 0 12px 28px rgba(76, 110, 245, 0.35);
-  }
-
   @media (pointer: coarse) {
     .color-picker {
       display: none;
@@ -333,11 +278,8 @@ style.textContent = `
       display: block;
     }
 
-    .advanced-button {
-      display: flex;
-      width: 100%;
-      font-size: 1rem;
-      padding: 12px 18px;
+    .advanced-picker {
+      display: block;
     }
   }
 
@@ -387,18 +329,65 @@ app.innerHTML = `
             aria-label="기본 색상 선택"
           />
           <span class="color-picker-hint">기본 색상을 선택하세요</span>
-          <div
-            class="color-inline-preview"
-            data-role="inline-preview"
-            aria-hidden="true"
-          ></div>
-          <button
-            type="button"
-            class="advanced-button"
-            data-role="open-advanced"
-          >
-            세밀한 색상 선택
-          </button>
+        <div
+          class="color-inline-preview"
+          data-role="inline-preview"
+          aria-hidden="true"
+        ></div>
+        <div class="advanced-picker" data-role="advanced-picker">
+          <div class="advanced-picker__panel">
+            <h3>세밀한 색상 조정</h3>
+            <div
+              class="advanced-picker__preview"
+              data-role="dialog-preview"
+            ></div>
+            <p class="advanced-picker__hex" data-role="dialog-hex">#4C6EF5</p>
+            <div class="advanced-picker__sliders">
+              <div class="slider-row">
+                <div class="slider-row__head">
+                  <label for="hue-range">색상 (Hue)</label>
+                  <output data-role="hue-value">0°</output>
+                </div>
+                <input
+                  id="hue-range"
+                  type="range"
+                  min="0"
+                  max="360"
+                  value="220"
+                  data-role="hue-range"
+                />
+              </div>
+              <div class="slider-row">
+                <div class="slider-row__head">
+                  <label for="saturation-range">채도 (Saturation)</label>
+                  <output data-role="saturation-value">0%</output>
+                </div>
+                <input
+                  id="saturation-range"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="70"
+                  data-role="saturation-range"
+                />
+              </div>
+              <div class="slider-row">
+                <div class="slider-row__head">
+                  <label for="lightness-range">명도 (Lightness)</label>
+                  <output data-role="lightness-value">0%</output>
+                </div>
+                <input
+                  id="lightness-range"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="60"
+                  data-role="lightness-range"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
         <input
           class="hex-input"
@@ -418,72 +407,6 @@ app.innerHTML = `
       <h2>팔레트 추천</h2>
       <div class="palette-grid" data-role="suggestions"></div>
     </section>
-    <div class="color-dialog" data-role="color-dialog" hidden>
-      <div
-        class="color-dialog__panel"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="color-dialog-title"
-      >
-        <h3 id="color-dialog-title">색상 직접 선택</h3>
-        <div class="color-dialog__preview" data-role="dialog-preview"></div>
-        <p class="color-dialog__hex" data-role="dialog-hex">#4C6EF5</p>
-        <div class="color-dialog__sliders">
-          <div class="slider-row">
-            <div class="slider-row__head">
-              <label for="hue-range">색상 (Hue)</label>
-              <output data-role="hue-value">0°</output>
-            </div>
-            <input
-              id="hue-range"
-              type="range"
-              min="0"
-              max="360"
-              value="220"
-              data-role="hue-range"
-            />
-          </div>
-          <div class="slider-row">
-            <div class="slider-row__head">
-              <label for="saturation-range">채도 (Saturation)</label>
-              <output data-role="saturation-value">0%</output>
-            </div>
-            <input
-              id="saturation-range"
-              type="range"
-              min="0"
-              max="100"
-              value="70"
-              data-role="saturation-range"
-            />
-          </div>
-          <div class="slider-row">
-            <div class="slider-row__head">
-              <label for="lightness-range">명도 (Lightness)</label>
-              <output data-role="lightness-value">0%</output>
-            </div>
-            <input
-              id="lightness-range"
-              type="range"
-              min="0"
-              max="100"
-              value="60"
-              data-role="lightness-range"
-            />
-          </div>
-        </div>
-        <div class="color-dialog__actions">
-          <button type="button" data-role="cancel-advanced">취소</button>
-          <button
-            type="button"
-            class="primary"
-            data-role="apply-advanced"
-          >
-            적용
-          </button>
-        </div>
-      </div>
-    </div>
   </main>
 `;
 
@@ -499,10 +422,6 @@ const hexField = requireElement<HTMLInputElement>(
   app.querySelector(".hex-input"),
   "HEX 입력창을 찾을 수 없습니다."
 );
-const openAdvancedButton = requireElement<HTMLButtonElement>(
-  app.querySelector("[data-role=open-advanced]"),
-  "세밀한 색상 선택 버튼을 찾을 수 없습니다."
-);
 const inlinePreview = requireElement<HTMLDivElement>(
   app.querySelector("[data-role=inline-preview]"),
   "인라인 색상 미리보기를 찾을 수 없습니다."
@@ -514,10 +433,6 @@ const suggestionsGrid = requireElement<HTMLDivElement>(
 const statusText = requireElement<HTMLDivElement>(
   app.querySelector("[data-role=status]"),
   "상태 영역을 찾을 수 없습니다."
-);
-const colorDialog = requireElement<HTMLDivElement>(
-  app.querySelector("[data-role=color-dialog]"),
-  "색상 선택 대화상자를 찾을 수 없습니다."
 );
 const dialogPreview = requireElement<HTMLDivElement>(
   app.querySelector("[data-role=dialog-preview]"),
@@ -551,19 +466,9 @@ const lightnessValueLabel = requireElement<HTMLOutputElement>(
   app.querySelector("[data-role=lightness-value]"),
   "Lightness 값 표시를 찾을 수 없습니다."
 );
-const applyAdvancedButton = requireElement<HTMLButtonElement>(
-  app.querySelector("[data-role=apply-advanced]"),
-  "고급 색상 적용 버튼을 찾을 수 없습니다."
-);
-const cancelAdvancedButton = requireElement<HTMLButtonElement>(
-  app.querySelector("[data-role=cancel-advanced]"),
-  "고급 색상 취소 버튼을 찾을 수 없습니다."
-);
 
 let isRequestInFlight = false;
 let currentBaseColor = defaultColor;
-let lastFocusedElement: HTMLElement | null = null;
-let previousBodyOverflow: string | null = null;
 
 initialize(defaultColor);
 
@@ -578,34 +483,10 @@ hexField.addEventListener("input", () => {
   }
 });
 
-openAdvancedButton.addEventListener("click", () => {
-  openAdvancedPicker();
-});
-
-cancelAdvancedButton.addEventListener("click", () => {
-  closeAdvancedPicker();
-});
-
-applyAdvancedButton.addEventListener("click", () => {
-  applyAdvancedSelection();
-});
-
 [hueRange, saturationRange, lightnessRange].forEach((range) => {
   range.addEventListener("input", () => {
     syncAdvancedPreview();
   });
-});
-
-colorDialog.addEventListener("click", (event) => {
-  if (event.target === colorDialog) {
-    closeAdvancedPicker();
-  }
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !colorDialog.hidden) {
-    closeAdvancedPicker();
-  }
 });
 
 form.addEventListener("submit", async (event) => {
@@ -646,13 +527,15 @@ function initialize(initialHex: string) {
   renderSuggestions([]);
 }
 
-function updateBaseColor(hex: string) {
+function updateBaseColor(hex: string, options: { skipAdvancedSync?: boolean } = {}) {
   const normalized = ensureHashPrefix(hex);
   colorField.value = normalized;
   hexField.value = normalized;
   currentBaseColor = normalized;
   inlinePreview.style.background = normalized;
-  syncAdvancedControls(normalized);
+  if (!options.skipAdvancedSync) {
+    syncAdvancedControls(normalized);
+  }
 }
 
 function toggleFormDisabled(disabled: boolean) {
@@ -705,33 +588,6 @@ function renderSuggestions(suggestions: PaletteSuggestion[]) {
   suggestionsGrid.innerHTML = baseCard + suggestionCards;
 }
 
-function openAdvancedPicker() {
-  lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  syncAdvancedControls(currentBaseColor);
-  colorDialog.hidden = false;
-  previousBodyOverflow = document.body.style.overflow;
-  document.body.style.overflow = "hidden";
-  applyAdvancedButton.focus();
-}
-
-function closeAdvancedPicker() {
-  colorDialog.hidden = true;
-  if (previousBodyOverflow !== null) {
-    document.body.style.overflow = previousBodyOverflow;
-    previousBodyOverflow = null;
-  }
-  if (lastFocusedElement) {
-    lastFocusedElement.focus();
-    lastFocusedElement = null;
-  }
-}
-
-function applyAdvancedSelection() {
-  const selectedHex = dialogPreview.dataset.currentHex ?? currentBaseColor;
-  updateBaseColor(selectedHex);
-  closeAdvancedPicker();
-}
-
 function syncAdvancedControls(hex: string) {
   const { h, s, l } = hexToHsl(hex);
   hueRange.value = String(Math.round(h));
@@ -752,6 +608,7 @@ function syncAdvancedPreview() {
   dialogPreview.style.background = hex;
   dialogPreview.dataset.currentHex = hex;
   dialogHexLabel.textContent = hex;
+  updateBaseColor(hex, { skipAdvancedSync: true });
 }
 
 function updateSliderOutputs() {
