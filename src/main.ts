@@ -339,7 +339,7 @@ app.innerHTML = `
       </a>
     </div>
     <section class="hero">
-      <h1>AI 슬라이드 팔레트 도우미</h1>
+      <h1>AI PPT 팔레트 도우미</h1>
       <p>
         기본 색상을 고르면 AI (Gemini)가 프레젠테이션용 보조 색상 다섯 가지와 활용법을 추천해 드립니다.
       </p>
