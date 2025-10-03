@@ -93,6 +93,15 @@ style.textContent = `
     text-align: center;
   }
 
+  .color-inline-preview {
+    display: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
   .advanced-button {
     padding: 10px 16px;
     border-radius: 12px;
@@ -316,6 +325,10 @@ style.textContent = `
     .color-picker {
       display: none;
     }
+
+    .color-inline-preview {
+      display: block;
+    }
   }
 
 `;
@@ -364,6 +377,11 @@ app.innerHTML = `
             aria-label="기본 색상 선택"
           />
           <span class="color-picker-hint">기본 색상을 선택하세요</span>
+          <div
+            class="color-inline-preview"
+            data-role="inline-preview"
+            aria-hidden="true"
+          ></div>
           <button
             type="button"
             class="advanced-button"
@@ -474,6 +492,10 @@ const hexField = requireElement<HTMLInputElement>(
 const openAdvancedButton = requireElement<HTMLButtonElement>(
   app.querySelector("[data-role=open-advanced]"),
   "세밀한 색상 선택 버튼을 찾을 수 없습니다."
+);
+const inlinePreview = requireElement<HTMLDivElement>(
+  app.querySelector("[data-role=inline-preview]"),
+  "인라인 색상 미리보기를 찾을 수 없습니다."
 );
 const suggestionsGrid = requireElement<HTMLDivElement>(
   app.querySelector("[data-role=suggestions]"),
@@ -619,6 +641,7 @@ function updateBaseColor(hex: string) {
   colorField.value = normalized;
   hexField.value = normalized;
   currentBaseColor = normalized;
+  inlinePreview.style.background = normalized;
   syncAdvancedControls(normalized);
 }
 
