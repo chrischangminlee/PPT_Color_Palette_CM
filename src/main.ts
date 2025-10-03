@@ -124,12 +124,23 @@ style.textContent = `
     text-align: center;
   }
 
+  .advanced-picker__body {
+    display: grid;
+    gap: 16px;
+  }
+
   .advanced-picker__preview {
     width: 100%;
     height: 120px;
     border-radius: 14px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .advanced-picker__controls {
+    display: grid;
+    gap: 12px;
+    align-content: start;
   }
 
   .advanced-picker__hex {
@@ -281,6 +292,20 @@ style.textContent = `
     .advanced-picker {
       display: block;
     }
+
+    .advanced-picker__body {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      align-items: stretch;
+    }
+
+    .advanced-picker__preview {
+      height: 100%;
+      min-height: 160px;
+    }
+
+    .advanced-picker__hex {
+      text-align: left;
+    }
   }
 
 `;
@@ -337,53 +362,57 @@ app.innerHTML = `
         <div class="advanced-picker" data-role="advanced-picker">
           <div class="advanced-picker__panel">
             <h3>세밀한 색상 조정</h3>
-            <div
-              class="advanced-picker__preview"
-              data-role="dialog-preview"
-            ></div>
-            <p class="advanced-picker__hex" data-role="dialog-hex">#4C6EF5</p>
-            <div class="advanced-picker__sliders">
-              <div class="slider-row">
-                <div class="slider-row__head">
-                  <label for="hue-range">색상 (Hue)</label>
-                  <output data-role="hue-value">0°</output>
+            <div class="advanced-picker__body">
+              <div
+                class="advanced-picker__preview"
+                data-role="dialog-preview"
+              ></div>
+              <div class="advanced-picker__controls">
+                <p class="advanced-picker__hex" data-role="dialog-hex">#4C6EF5</p>
+                <div class="advanced-picker__sliders">
+                  <div class="slider-row">
+                    <div class="slider-row__head">
+                      <label for="hue-range">색상 (Hue)</label>
+                      <output data-role="hue-value">0°</output>
+                    </div>
+                    <input
+                      id="hue-range"
+                      type="range"
+                      min="0"
+                      max="360"
+                      value="220"
+                      data-role="hue-range"
+                    />
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-row__head">
+                      <label for="saturation-range">채도 (Saturation)</label>
+                      <output data-role="saturation-value">0%</output>
+                    </div>
+                    <input
+                      id="saturation-range"
+                      type="range"
+                      min="0"
+                      max="100"
+                      value="70"
+                      data-role="saturation-range"
+                    />
+                  </div>
+                  <div class="slider-row">
+                    <div class="slider-row__head">
+                      <label for="lightness-range">명도 (Lightness)</label>
+                      <output data-role="lightness-value">0%</output>
+                    </div>
+                    <input
+                      id="lightness-range"
+                      type="range"
+                      min="0"
+                      max="100"
+                      value="60"
+                      data-role="lightness-range"
+                    />
+                  </div>
                 </div>
-                <input
-                  id="hue-range"
-                  type="range"
-                  min="0"
-                  max="360"
-                  value="220"
-                  data-role="hue-range"
-                />
-              </div>
-              <div class="slider-row">
-                <div class="slider-row__head">
-                  <label for="saturation-range">채도 (Saturation)</label>
-                  <output data-role="saturation-value">0%</output>
-                </div>
-                <input
-                  id="saturation-range"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value="70"
-                  data-role="saturation-range"
-                />
-              </div>
-              <div class="slider-row">
-                <div class="slider-row__head">
-                  <label for="lightness-range">명도 (Lightness)</label>
-                  <output data-role="lightness-value">0%</output>
-                </div>
-                <input
-                  id="lightness-range"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value="60"
-                  data-role="lightness-range"
-                />
               </div>
             </div>
           </div>
@@ -399,7 +428,7 @@ app.innerHTML = `
         />
       </div>
       <button class="submit-button" type="submit">
-        조화로운 색상 추천 받기
+        PPT 색 조합 추천 받기
       </button>
       <div class="status" data-role="status"></div>
     </form>
@@ -561,16 +590,6 @@ function renderSuggestions(suggestions: PaletteSuggestion[]) {
     return;
   }
 
-  const baseCard = `
-    <article class="palette-card" aria-label="기본 색상">
-      <div class="swatch" style="background:${currentBaseColor}"></div>
-      <div class="info">
-        <span class="hex">${currentBaseColor}</span>
-        <span class="usage">기본 색상</span>
-      </div>
-    </article>
-  `;
-
   const suggestionCards = suggestions
     .map(
       (suggestion) => `
@@ -585,7 +604,7 @@ function renderSuggestions(suggestions: PaletteSuggestion[]) {
     )
     .join("");
 
-  suggestionsGrid.innerHTML = baseCard + suggestionCards;
+  suggestionsGrid.innerHTML = suggestionCards;
 }
 
 function syncAdvancedControls(hex: string) {
