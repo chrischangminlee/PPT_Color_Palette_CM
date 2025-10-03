@@ -103,6 +103,9 @@ style.textContent = `
   }
 
   .advanced-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px 16px;
     border-radius: 12px;
     border: 1px solid var(--border);
@@ -328,6 +331,13 @@ style.textContent = `
 
     .color-inline-preview {
       display: block;
+    }
+
+    .advanced-button {
+      display: flex;
+      width: 100%;
+      font-size: 1rem;
+      padding: 12px 18px;
     }
   }
 
