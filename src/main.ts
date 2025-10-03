@@ -57,6 +57,19 @@ style.textContent = `
     align-items: center;
   }
 
+  .color-picker-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .color-picker-hint {
+    font-size: 0.85rem;
+    color: rgba(17, 24, 39, 0.65);
+    text-align: center;
+  }
+
   .color-picker {
     border: 0;
     width: 72px;
@@ -180,6 +193,11 @@ style.textContent = `
     color: rgba(17, 24, 39, 0.68);
   }
 
+  .palette-card .info .usage {
+    font-size: 0.85rem;
+    color: rgba(55, 65, 81, 0.75);
+  }
+
   .palette-card .info p {
     margin: 0;
     font-size: 0.85rem;
@@ -200,16 +218,15 @@ const defaultColor = "#4C6EF5";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) {
-  throw new Error("Root element #app not found");
+throw new Error("루트 요소 #app을 찾을 수 없습니다.");
 }
 
 app.innerHTML = `
   <main class="shell">
     <section class="hero">
-      <h1>Slide Palette Companion</h1>
+      <h1>슬라이드 팔레트 도우미</h1>
       <p>
-        Choose a base color and let Gemini recommend five supporting hues,
-        complete with slide roles and rationale tailored for presentation design.
+        기본 색상을 고르면 Gemini가 프레젠테이션용 보조 색상 다섯 가지와 활용법을 추천해 드립니다.
       </p>
     </section>
     <form class="palette-form" autocomplete="off">
@@ -217,32 +234,35 @@ app.innerHTML = `
         <div class="swatch" aria-hidden="true"></div>
         <div class="meta">
           <strong data-role="preview-hex"></strong>
-          <span>Selected base color</span>
+          <span>선택한 기본 색상</span>
         </div>
       </div>
       <div class="inputs-row">
-        <input
-          class="color-picker"
-          type="color"
-          name="baseColor"
-          aria-label="Select base color"
-        />
+        <div class="color-picker-wrapper">
+          <input
+            class="color-picker"
+            type="color"
+            name="baseColor"
+            aria-label="기본 색상 선택"
+          />
+          <span class="color-picker-hint">기본 색상을 선택하세요</span>
+        </div>
         <input
           class="hex-input"
           name="hex"
           placeholder="#4C6EF5"
           maxlength="7"
           pattern="#?[0-9a-fA-F]{6}"
-          aria-label="Hex value"
+          aria-label="HEX 값"
         />
       </div>
       <button class="submit-button" type="submit">
-        Suggest harmonious colors
+        조화로운 색상 추천 받기
       </button>
       <div class="status" data-role="status"></div>
     </form>
     <section>
-      <h2>Palette recommendations</h2>
+      <h2>팔레트 추천</h2>
       <div class="palette-grid" data-role="suggestions"></div>
     </section>
   </main>
@@ -250,31 +270,31 @@ app.innerHTML = `
 
 const form = requireElement<HTMLFormElement>(
   app.querySelector("form.palette-form"),
-  "Form element not found"
+  "팔레트 폼을 찾을 수 없습니다."
 );
 const colorField = requireElement<HTMLInputElement>(
   app.querySelector(".color-picker"),
-  "Color picker not found"
+  "색상 선택기를 찾을 수 없습니다."
 );
 const hexField = requireElement<HTMLInputElement>(
   app.querySelector(".hex-input"),
-  "Hex input not found"
+  "HEX 입력창을 찾을 수 없습니다."
 );
 const previewCard = requireElement<HTMLDivElement>(
   app.querySelector("[data-role=preview]"),
-  "Preview card not found"
+  "미리보기 카드를 찾을 수 없습니다."
 );
 const previewHex = requireElement<HTMLSpanElement>(
   app.querySelector("[data-role=preview-hex]"),
-  "Preview hex label not found"
+  "미리보기 HEX 라벨을 찾을 수 없습니다."
 );
 const suggestionsGrid = requireElement<HTMLDivElement>(
   app.querySelector("[data-role=suggestions]"),
-  "Suggestions container not found"
+  "추천 영역을 찾을 수 없습니다."
 );
 const statusText = requireElement<HTMLDivElement>(
   app.querySelector("[data-role=status]"),
-  "Status container not found"
+  "상태 영역을 찾을 수 없습니다."
 );
 
 let isRequestInFlight = false;
@@ -300,14 +320,14 @@ form.addEventListener("submit", async (event) => {
 
   const baseColor = colorField.value;
   if (!isValidHex(baseColor)) {
-    setStatus("Enter a valid 6-digit hex color.", true);
+    setStatus("유효한 6자리 HEX 색상을 입력하세요.", true);
     return;
   }
 
   try {
     isRequestInFlight = true;
     toggleFormDisabled(true);
-    setStatus("Asking Gemini for palette ideas…", false);
+    setStatus("Gemini에게 팔레트를 요청하고 있어요…", false);
     const suggestions = await suggestPalette(baseColor);
     renderSuggestions(suggestions);
     setStatus("", false);
@@ -316,7 +336,7 @@ form.addEventListener("submit", async (event) => {
     setStatus(
       error instanceof Error
         ? error.message
-        : "Something went wrong while fetching suggestions.",
+        : "추천을 불러오는 중 오류가 발생했습니다.",
       true
     );
   } finally {
@@ -356,7 +376,7 @@ function renderSuggestions(suggestions: PaletteSuggestion[]) {
   if (!suggestions.length) {
     suggestionsGrid.innerHTML = `
       <p style="margin: 0; color: rgba(17, 24, 39, 0.6);">
-        Run a suggestion to see complementary colors with usage ideas.
+        추천을 실행하면 활용 예시와 함께 어울리는 보조 색상을 확인할 수 있어요.
       </p>
     `;
     return;
@@ -369,8 +389,8 @@ function renderSuggestions(suggestions: PaletteSuggestion[]) {
           <div class="swatch" style="background:${suggestion.hex}"></div>
           <div class="info">
             <strong>${suggestion.name}</strong>
-            <span>${suggestion.hex} · ${suggestion.role}</span>
-            <p>${suggestion.rationale}</p>
+            <span>${suggestion.hex}</span>
+            <span class="usage">${suggestion.role}</span>
           </div>
         </article>
       `

@@ -25,7 +25,7 @@ export async function suggestPalette(
 
   if (!apiKey) {
     throw new Error(
-      "Gemini API key is missing. Set VITE_GEMINI_API_KEY in your environment."
+      "Gemini API 키가 없습니다. 환경 변수 VITE_GEMINI_API_KEY를 설정하세요."
     );
   }
 
@@ -58,7 +58,7 @@ export async function suggestPalette(
   if (!response.ok) {
     const message = await response.text();
     throw new Error(
-      `Gemini request failed: ${response.status} ${response.statusText} - ${message}`
+      `Gemini 요청이 실패했습니다: ${response.status} ${response.statusText} - ${message}`
     );
   }
 
@@ -69,7 +69,7 @@ export async function suggestPalette(
     .trim();
 
   if (!textContent) {
-    throw new Error("Gemini response did not include any text content.");
+    throw new Error("Gemini 응답에 텍스트가 포함되어 있지 않습니다.");
   }
 
   try {
@@ -80,8 +80,8 @@ export async function suggestPalette(
       hex: normalizeHex(suggestion.hex),
     }));
   } catch (error) {
-    console.error("Failed to parse Gemini response", { textContent, error });
-    throw new Error("Unable to parse Gemini response. Check console for details.");
+    console.error("Gemini 응답을 파싱하지 못했습니다", { textContent, error });
+    throw new Error("Gemini 응답을 해석할 수 없습니다. 자세한 내용은 콘솔을 확인하세요.");
   }
 }
 
